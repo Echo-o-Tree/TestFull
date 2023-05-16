@@ -6,7 +6,8 @@
 --		Desc:			A simple lua script to pull info from github using some weird shit tbh
 --		Copyright:	dunno what to put here, use it, don't sell it. ggnore
 --===============================================================================--]]
-
+--lets set the search paths for loading files
+package.path = package.path..';./include/?.lua'
 -- Let's preload a couple of handy files I've made
 require ( 'getos' )
 require ( 'simpleFunctions' )
@@ -39,4 +40,23 @@ if ( gMode == 100 ) then
 	print ( 'Version No: v'..gVersion )
 end
 
-dofile ( gpIncludeFolder..'\\updater.lua' )
+function dofileFromSubdirectories(filename)
+    local function searchSubdirectories(directory)
+        for entry in io.popen('dir "' .. directory .. '" /b /ad'):lines() do
+            local subdir = directory .. "/" .. entry
+            local filepath = subdir .. "/" .. filename
+            local file = io.open(filepath, "r")
+            if file then
+                file:close()
+                return dofile(filepath)
+            end
+            if entry ~= "." and entry ~= ".." then
+                searchSubdirectories(subdir)
+            end
+        end
+    end
+
+    searchSubdirectories(".")
+    error("Failed to find and execute file: " .. filename)
+end
+dofileFromSubdirectories ( 'updater.lua' )
