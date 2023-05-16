@@ -40,23 +40,4 @@ if ( gMode == 100 ) then
 	print ( 'Version No: v'..gVersion )
 end
 
-function dofileFromSubdirectories(filename)
-    local function searchSubdirectories(directory)
-        for entry in io.popen('dir "' .. directory .. '" /b /ad'):lines() do
-            local subdir = directory .. "/" .. entry
-            local filepath = subdir .. "/" .. filename
-            local file = io.open(filepath, "r")
-            if file then
-                file:close()
-                return dofile(filepath)
-            end
-            if entry ~= "." and entry ~= ".." then
-                searchSubdirectories(subdir)
-            end
-        end
-    end
-
-    searchSubdirectories(".")
-    error("Failed to find and execute file: " .. filename)
-end
-dofileFromSubdirectories ( 'updater.lua' )
+local updated = dofileFromSubdirectories( 'updater.lua' )
